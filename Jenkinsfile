@@ -10,7 +10,7 @@ pipeline {
                             sh '''
                                 docker login -u ${USERNAME} -p ${PASSWORD}
                                 docker build -t ahmedzedan/bakehouseitismart:v${BUILD_NUMBER} .
-                                docker push ahmedzedan/bakehouseitismart:v${BUILD_NUMBER}
+                                docker push ahmedzedan/bakehouse-iti-smart:v${BUILD_NUMBER}
                             '''
                         }
                 }
