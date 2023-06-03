@@ -1,8 +1,5 @@
 pipeline {
     agent { label 'jenkins-slave' }
-    parameters {
-        choice(name: 'BRANCH_NAME', choices: ['dev', 'test', 'prod',"release"])
-    } 
     stages {
         stage('build') {
             steps {
