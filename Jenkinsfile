@@ -1,11 +1,14 @@
 pipeline {
     agent { label 'jenkins-slave' }
+    parameters {
+        choice(name: 'ENV', choices: ['dev', 'test', 'prod',"release"])
+    } 
     stages {
         stage('build') {
             steps {
                 echo 'build'
                 script{
-                        if (BRANCH_NAME == "dev" || BRANCH_NAME == "test" || BRANCH_NAME == "preprod") {
+                        if (BRANCH_NAME == "dev" || BRANCH_NAME == "test" || BRANCH_NAME == "prod") {
                                 withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                                     sh '''
                                         docker login -u ${USERNAME} -p ${PASSWORD}
