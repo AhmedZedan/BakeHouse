@@ -1,0 +1,32 @@
+Deployment:
+  name: bakehouse
+  label: bakehouse
+
+namespace : test-space
+
+repl:
+  num: 1
+
+temp:
+  label: bakehouse
+
+container:
+  name: bakehouse
+  imagePullPolicy: Always
+  port: 80
+
+image:
+  repository: ahmedzedan
+  name: bakehouse-iti-smart
+  tag: v4
+
+
+service:
+  name: bakehouse-service
+  label: bakehouse-service
+  prot_name: bakehouseport
+  port: 80
+  protocol: TCP
+  targetPort: 80
+  type: NodePort
+  app: bakehouse
