@@ -13,6 +13,6 @@ spec:
     targetPort: 80
   selector:
     app: bakehouse
-  type: NodePort
+  type: LoadBalancer
 status:
   loadBalancer: {}
