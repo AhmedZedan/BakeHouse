@@ -1,0 +1,45 @@
+pipeline {
+    agent { label 'jenkins-slave' }
+    stages {
+         stage('build') {
+             steps {
+                 echo 'build'
+                 script{
+                         if (BRANCH_NAME == "release") {
+                                 withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                     sh '''
+                                         docker login -u ${USERNAME} -p ${PASSWORD}
+                                         docker build -t ahmedzedan/bakehouse-iti-smart:v${BUILD_NUMBER} .
+                                         docker push ahmedzedan/bakehouse-iti-smart:v${BUILD_NUMBER}
+                                         echo ${BUILD_NUMBER} > ../build.txt
+                                     '''
+                                 }
+                     }
+                 }
+             }
+         }
+        stage('deploy') {
+            steps {
+                echo 'deploy'
+                script {
+                         if (BRANCH_NAME == "dev" || BRANCH_NAME == "test" || BRANCH_NAME == "prod") {
+                                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                                    sh '''
+                                        export BUILD_NUMBER=$(cat ../build.txt)
+                                        export env=$(helm list | grep ^${BRANCH_NAME})     
+                                        if [ -z $env ]
+                                        then
+                                            helm install ${BRANCH_NAME}-bakehouse ./deploy-BakeHouse --values ./deploy-BakeHouse/${BRANCH_NAME}_values.yml \
+                                                --set tag=v${BUILD_NUMBER}
+                                        else
+                                            helm upgrade ${BRANCH_NAME}-bakehouse ./deploy-BakeHouse --values ./deploy-BakeHouse/${BRANCH_NAME}_values.yml \
+                                                --set tag=v${BUILD_NUMBER}
+                                        fi
+                                    '''
+                                }
+                         }
+                    }
+                }
+          }
+    }
+}
